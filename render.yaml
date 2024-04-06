@@ -1,0 +1,16 @@
+databases:
+  - name: surveycraft-db
+    databaseName: mysite
+    user: mysite
+    region: singapore
+    plan: free
+
+services:
+  - type: web
+    name: surveycraft
+    env: python
+    plan: free
+    branch: main
+    buildCommand: "./build.sh"
+    region: singapore
+    startCommand: "gunicorn surveycraft.wsgi:application --log-file -"
