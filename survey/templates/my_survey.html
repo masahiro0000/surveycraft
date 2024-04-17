@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    マイページ
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% if surveys %}
+            {% for survey in surveys %}
+                <p class="h5">タイトル</p>
+                {{ survey.title }}
+                <br><br>
+                <p class="h6">説明</p>
+                {{ survey.description }}
+                <br><br>
+            {% endfor %}
+        {% else %}
+            <h3>作成済みのアンケートはありません</h3>
+        {% endif %}
+        <hr>
+        <a href="{% url 'create' %}" class="btn btn-primary">アンケートを作成する</a>
+    </div>
+{% endblock %}

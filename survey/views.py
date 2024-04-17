@@ -59,4 +59,9 @@ def create(request):
 
 @login_required
 def my_survey(request):
-    return render(request, "my_survey.html")
+    profile = Profile.objects.get(user=request.user)
+    surveys = Survey.objects.filter(profile=profile)
+    context = {
+        "surveys": surveys
+    }
+    return render(request, "my_survey.html", context)
