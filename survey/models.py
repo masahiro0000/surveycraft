@@ -2,7 +2,7 @@ from django.db import models
 from accounts.models import Profile
 
 class Survey(models.Model):
-    user = models.ForeignKey(Profile, related_name="surveys", on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, related_name="surveys", on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
