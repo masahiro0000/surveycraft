@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    アンケート作成ページ
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form method="POST">
+            {% csrf_token %}
+            <h3>アンケートの概要</h3>
+            <br>
+            {{ survey_form.title.label }}
+            {{ survey_form.title }}
+            <br>
+            {{ survey_form.description.label }}
+            {{ survey_form.description }}
+            <br><hr><br>
+            
+            <h4>アンケートの詳細</h4>
+            {% for i in loop_times %}
+                <ul>
+                    <li>
+                        {{ i }}つ目の質問
+                        <br>
+                        {{ question_form.text.label }}
+                        {{ question_form.text }}
+                        <br>
+                    
+                        {{ question_form.question_type.label }}
+                        {{ question_form.question_type }}
+                    
+                        <div class="choices-container" id="choices-container-{{ forloop.counter }}" style="display: none;">
+                            {{ choice_form.text1 }}
+                            <br>
+                            {{ choice_form.text2 }}
+                            <br>
+                            {{ choice_form.text3 }}
+                        </div>
+                    
+                        <div class="rating-container" id="rating-container-{{ forloop.counter }}" style="display: none;">
+                            {{ rating_form.text1 }}
+                            <br>
+                            {{ rating_form.text2 }}
+                            <br>
+                            {{ rating_form.text3 }}
+                        </div>
+                    
+                        <br>
+                        {{ question_form.is_required.label }}
+                        {{ question_form.is_required }}
+                    </li>
+                </ul>
+                <br>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">作成</button>
+        </form>
+    </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Djangoが生成する各質問タイプセレクトボックスに対して処理を行う
+        const questionTypeSelects = document.querySelectorAll('[id^="id_question_type"]');    // IDが'id_question_type'で始まる全ての要素を取得
+
+        questionTypeSelects.forEach(function(select, index) {
+            const choicesContainer = document.getElementById(`choices-container-${index + 1}`);
+            const ratingContainer = document.getElementById(`rating-container-${index + 1}`);
+
+            function updateVisibility() {
+                const selectedType = select.value;
+                if (selectedType === 'SC' || selectedType === 'MC') {
+                    choicesContainer.style.display = 'block';
+                } else {
+                    choicesContainer.style.display = 'none';
+                }
+
+                if (selectedType === 'RS') {
+                    ratingContainer.style.display = 'block';
+                } else {
+                    ratingContainer.style.display = 'none';
+                }
+            }
+
+            // 初期表示時にも正しい表示状態に更新
+            updateVisibility();
+
+            // 質問タイプが変更されたときのイベントハンドラをセットアップ
+            select.addEventListener('change', updateVisibility);
+        });
+    });
+</script>
+
+{% endblock %}
