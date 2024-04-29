@@ -23,12 +23,12 @@ class Question(models.Model):
     TEXT = 'TX'
     SINGLE_CHOICE = 'SC'
     MULTIPLE_CHOICE = 'MC'
-    RATING_SCALE = 'RS'
+    RATING_SCORE = 'RS'
     QUESTION_TYPE = [
         (TEXT, 'テキスト入力'),
         (SINGLE_CHOICE, '単一選択式'),
         (MULTIPLE_CHOICE, '複数選択式'),
-        (RATING_SCALE, '評価スケール(1~5の評価スコア)'),
+        (RATING_SCORE, '評価スケール(1~5の評価スコア)'),
     ]
 
     survey = models.ForeignKey(
@@ -71,9 +71,6 @@ class Rating(models.Model):
     rating_score = models.PositiveIntegerField(
         choices=[(i, str(i)) for i in range(1,6)]   # 1~5の評価スコア
         )
-    #text1 = models.CharField(max_length=255)    # 1つ目の評価軸
-    #text2 = models.CharField(max_length=255)    # 2つ目の評価軸
-    #text3 = models.CharField(max_length=255)    # 3つ目の評価軸
 
     def __str__(self):
         return f"{self.question} - {self.rating_score}"
@@ -112,7 +109,7 @@ class Answer(models.Model):
         elif self.question.question_type == Question.MULTIPLE_CHOICE and self.choices.exists():
             choices_texts = ', '.join(choice.text for choice in self.choices.all())
             return f"Multiple Choice Answers: {choices_texts}"
-        elif self.question.question_type == Question.RATING_SCALE and self.rating_score:
+        elif self.question.question_type == Question.RATING_SCORE and self.rating_score:
             return f"Rating Scale: {self.rating_score}"
         elif self.text:
             return f"Text Answer: {self.text}"
