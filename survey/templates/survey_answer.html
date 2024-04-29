@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    アンケート回答ページ
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h3>{{ survey.title }}</h3>
+        <h4>{{ survey.description }}</h4>
+        <form method="POST">
+            {% csrf_token %}
+            {% for question, form in answer_forms %}
+                {{ question.text }}
+                {{ form.as_p }}
+            {% endfor %}
+            <button class="btn btn-primary">送信</button>
+        </form>
+    </div>
+{% endblock %}

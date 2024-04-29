@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    アンケート一覧
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% for survey in surveys %}
+            <p>タイトル</p>
+            {{ survey.title }}
+            <p>詳細</p>
+            {{ survey.description }}
+            <a href="{{ survey.get_absolute_url }}" class="btn btn-primary">このアンケートに回答する</a>
+            <br>
+        {% endfor %}
+    </div>
+{% endblock %}

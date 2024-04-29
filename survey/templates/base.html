@@ -24,6 +24,7 @@
         <div class="nav-scroller py-1 mb-3 border-bottom">
             <nav class="nav nav-underline justify-content-start">
                 <a class="nav-item nav-link link-body-emphasis" href="{% url 'index' %}">surveycraftとは</a>
+                <a class="nav-item nav-link link-body-emphasis" href="{% url 'survey-all' %}">全てのアンケート</a>
                 <a class="nav-item nav-link link-body-emphasis" href="{% url 'my-survey' %}">my-survey</a>
 
                 {% if not user.is_authenticated %}
