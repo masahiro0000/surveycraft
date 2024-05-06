@@ -19,24 +19,17 @@ def survey_all(request):
 def create(request):
     # htmlでアンケートの詳細を5回だけ繰り返すための変数
     loop_times = list(range(1,6))
-    #loop_times = 5
 
     if request.method == "POST":
+        # それぞれのフォームデータを格納する
         survey_form = SurveyForm(request.POST)
         question_forms = [QuestionForm(request.POST, prefix=str(i)) for i in loop_times]
-        choice_form = ChoiceForm(request.POST)
-        #rating_form = RatingForm(request.POST)
-        #if question_form.is_valid() and survey_form.is_valid() and choice_form.is_valid() and rating_form.is_valid():
+        choice_form_1 = [ChoiceForm(request.POST, prefix=f"choice_1_{i}") for i in loop_times]
+        choice_form_2 = [ChoiceForm(request.POST, prefix=f"choice_2_{i}") for i in loop_times]
+        choice_form_3 = [ChoiceForm(request.POST, prefix=f"choice_3_{i}") for i in loop_times]
 
         # question_formが全てis_validを満たすかどうか確認する
-        question_form_valid = True
-        for form in question_forms:
-            if not form.is_valid():
-                question_form_valid = False
-
-        if question_form_valid and survey_form.is_valid() and choice_form.is_valid():
-
-            # Profileオブジェクトを取得
+        if all(question_form.is_valid() for question_form in question_forms) and survey_form.is_valid():
             profile = Profile.objects.get(user=request.user)
 
             # surveyフォームをインスタンスにして、ユーザーを紐づける
@@ -45,35 +38,35 @@ def create(request):
             survey.save()
 
             # questionフォームをインスタンスにして、surveyオブジェクトを紐づける
-            for form in question_forms:
-                question = form.save(commit=False)
+            for q_form, c_form_1, c_form_2, c_form_3 in zip(question_forms, choice_form_1, choice_form_2, choice_form_3):
+                question = q_form.save(commit=False)
                 question.survey = survey
                 question.save()
 
-                if question.question_type in ['SC', 'MC']:  # 単一選択、複数選択の場合
+                # 単一選択、複数選択の場合、各質問に対する選択肢を扱う
+                if question.question_type in ['SC', 'MC'] and c_form_1.is_valid() and c_form_2.is_valid() and c_form_3.is_valid():
                     # choiceフォームをインスタンスにして、questionオブジェクトを紐づける
-                    choice = choice_form.save(commit=False)
-                    choice.question = question
-                    choice.save()
-
-            # ratingフォームをインスタンスにして、questionオブジェクトを紐づける
-            #rating = rating_form.save(commit=False)
-            #rating.question = question
-            #rating.save()
+                    choice_1 = c_form_1.save(commit=False)
+                    choice_2 = c_form_2.save(commit=False)
+                    choice_3 = c_form_3.save(commit=False)
+                    choice_1.question = question
+                    choice_2.question = question
+                    choice_3.question = question
+                    choice_1.save()
+                    choice_2.save()
+                    choice_3.save()
 
             return redirect('my-survey')
     else:
         survey_form = SurveyForm()
         question_forms = [QuestionForm(prefix=str(i)) for i in loop_times]
-        #question_forms = QuestionForm()
-        choice_form = ChoiceForm()
-        #rating_form = RatingForm()
+        choice_form_1 = [ChoiceForm(prefix=f"choice_1_{i}") for i in loop_times]
+        choice_form_2 = [ChoiceForm(prefix=f"choice_2_{i}") for i in loop_times]
+        choice_form_3 = [ChoiceForm(prefix=f"choice_3_{i}") for i in loop_times]
 
         context = {
             "survey_form": survey_form,
-            "question_forms": question_forms,
-            "choice_form": choice_form,
-            #"rating_form": rating_form,
+            'forms': zip(question_forms, choice_form_1, choice_form_2, choice_form_3),
             "loop_times": loop_times,
         }
         return render(request, "create.html", context)
@@ -88,56 +81,26 @@ def my_survey(request):
     return render(request, "my_survey.html", context)
 
 # アンケート回答ページ
-#def survey_answer(request, pk):
-#    survey = get_object_or_404(Survey, pk=pk)
-#    questions = Question.objects.filter(survey=survey)  # 該当するアンケートの質問を取得
-#    if request.method == "POST":
-#        # POSTリクエストの場合は、各質問に対して回答を保存
-#        for question in questions:
-#            question_data = {
-#                'question': question.id,
-#                'text': request.POST.get(f'text_{question.id}', None),
-#                'choice': request.POST.get(f'choice_{question.id}', None),
-#                'choices': request.POST.get(f'choices_{question.id}', None),
-#                'rating': request.POST.get(f'rating_{question.id}', None)
-#            }
-#            answer_form = AnswerForm(question_data)
-#            if answer_form.is_valid():
-#                answer = answer_form.save(commit=False)
-#                answer.question = question
-#                answer.save()
-#
-#        return redirect('index')
-#    else:
-#        # GETリクエストの場合は、各質問に対する空のフォームを生成
-#        answer_forms = []
-#        for question in questions:
-#            form = AnswerForm(initial={'question': question.id})
-#            answer_forms.append((question, form))    # question,formのペアのタプルを生成
-#        context = {
-#            "survey": survey,
-#            "answer_forms": answer_forms,
-#        }
-#        return render(request, "survey_answer.html", context)
-
 def survey_answer(request, pk):
     survey = get_object_or_404(Survey, pk=pk)
     questions = Question.objects.filter(survey=survey)
     if request.method == "POST":
         # POSTリクエストの場合は、各質問に対して回答を保存
         for question in questions:
-            form = AnswerForm(request.POST, question=question)
-            if form.is_valid():
-                form.save(commit=False)
-                form.question = question
-                form.save()
+            answer_form = AnswerForm(request.POST, question=question)
+            if answer_form.is_valid():
+                answer_form.save(commit=False)
+                answer_form.question = question
+                answer_form.save()
         return redirect('index')
     else:
         # GETリクエストの場合は、各質問に対する空のフォームを生成
         answer_forms = []
         for question in questions:
-            form = AnswerForm(initial={'question': question.id})
-            answer_forms.append((question, form))   # question,formのペアのタプルを生成
+            choices = Choice.objects.filter(question=question)
+            print(choices)
+            answer_form = AnswerForm(question=question)
+            answer_forms.append((question, answer_form, choices))   # question,formのペアのタプルを生成
         context = {
             "survey": survey,
             "answer_forms": answer_forms,

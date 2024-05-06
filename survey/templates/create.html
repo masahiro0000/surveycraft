@@ -18,29 +18,30 @@
             <br><hr><br>
 
             <h4>アンケートの詳細</h4>
-            {% for form in question_forms %}
+            {% for question_forms, choice_form_1, choice_form_2, choice_form_3 in forms %}
                 <ul>
                     <li>
                         {{ forloop.counter }}つ目の質問
                         <br>
-                        {{ form.text.label }}
-                        {{ form.text }}
+                        {{ question_forms.text.label }}
+                        {{ question_forms.text }}
                         <br>
 
-                        {{ form.question_type.label }}
-                        {{ form.question_type }}
+                        {{ question_forms.question_type.label }}
+                        {{ question_forms.question_type }}
 
                         <div class="choices-container" id="choices-container-{{ forloop.counter }}" style="display: none;">
-                            {{ choice_form.text1 }}
+                            {{ choice_form_1 }}
                             <br>
-                            {{ choice_form.text2 }}
+                            {{ choice_form_2 }}
                             <br>
-                            {{ choice_form.text3 }}
+                            {{ choice_form_3 }}
+                            <br>
                         </div>
 
                         <br>
-                        {{ form.is_required.label }}
-                        {{ form.is_required }}
+                        {{ question_forms.is_required.label }}
+                        {{ question_forms.is_required }}
                     </li>
                 </ul>
                 <br>
@@ -56,7 +57,6 @@
 
         questionTypeSelects.forEach(function(select, index) {
             const choicesContainer = document.getElementById(`choices-container-${index + 1}`);
-            //const ratingContainer = document.getElementById(`rating-container-${index + 1}`);
 
             function updateVisibility() {
                 const selectedType = select.value;
@@ -65,12 +65,6 @@
                 } else {
                     choicesContainer.style.display = 'none';
                 }
-
-                //if (selectedType === 'RS') {
-                //    ratingContainer.style.display = 'block';
-                //} else {
-                //    ratingContainer.style.display = 'none';
-                //}
             }
 
             // 初期表示時にも正しい表示状態に更新

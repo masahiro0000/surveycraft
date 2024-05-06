@@ -8,11 +8,20 @@
     <div class="container">
         <h3>{{ survey.title }}</h3>
         <h4>{{ survey.description }}</h4>
+        <hr>
         <form method="POST">
             {% csrf_token %}
-            {% for question, form in answer_forms %}
+            {% for question, answer_form, choice in answer_forms %}
                 {{ question.text }}
-                {{ form.as_p }}
+                {% if question.question_type == 'TX' %}
+                    {{ answer_form.text }}
+                {% elif question.question_type == 'SC' %}
+                    {{ answer_form.choice }}
+                {% elif question.question_type == 'MC' %}
+                    {{ answer_form.choices }}
+                {% elif question.question_type == 'RS' %}
+                    {{ answer_form.rating_score }}
+                {% endif %}
             {% endfor %}
             <button class="btn btn-primary">送信</button>
         </form>

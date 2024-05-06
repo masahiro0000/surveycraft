@@ -55,12 +55,10 @@ class Question(models.Model):
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, related_name="choices", on_delete=models.CASCADE)
-    text1 = models.CharField(max_length=255)    # 1つ目の選択肢
-    text2 = models.CharField(max_length=255)    # 2つ目の選択肢
-    text3 = models.CharField(max_length=255)    # 3つ目の選択肢
+    text = models.CharField(max_length=255)    # 選択肢のテキスト
 
     def __str__(self):
-        return f"{self.question} - {self.text1}, {self.text2}, {self.text3}"
+        return self.text
 
 class Rating(models.Model):
     question = models.ForeignKey(

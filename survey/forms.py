@@ -32,67 +32,33 @@ class QuestionForm(forms.ModelForm):
         fields = ['text', 'question_type', 'is_required']
 
 class ChoiceForm(forms.ModelForm):
-    text1 = forms.CharField(
-        label="選択肢1",
+    text = forms.CharField(
+        label="選択肢",
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "選択肢1"})
-    )
-    text2 = forms.CharField(
-        label="選択肢2",
-        required=False,
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "選択肢2"})
-    )
-    text3 = forms.CharField(
-        label="選択肢3",
-        required=False,
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "選択肢3"})
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "選択肢"})
     )
     class Meta:
         model = Choice
-        fields = ['text1', 'text2', 'text3']    # 3つの選択肢
-
-#class RatingForm(forms.ModelForm):
-#    rating_score = forms.CharField(
-#        label="評価",
-#        required=False,
-#        widget=forms.TextInput(attrs={"class": "form-control"})
-#    )
-#    text1 = forms.CharField(
-#        label="評価軸1",
-#        required=False,
-#        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "評価軸1"})
-#    )
-#    text2 = forms.CharField(
-#        label="評価軸2",
-#        required=False,
-#        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "評価軸2"})
-#    )
-#    text3 = forms.CharField(
-#        label="評価軸3",
-#        required=False,
-#        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "評価軸3"})
-#    )
-#    class Meta:
-#        model = Rating
-#        fields = ['text1', 'text2', 'text3']    # 3つの評価軸を設定
+        fields = ['text']
 
 class AnswerForm(forms.ModelForm):
     text = forms.CharField(
         label="回答",
         widget=forms.TextInput(attrs={"class": "form-control"}))
     choice = forms.ModelChoiceField(
-        queryset=Choice.objects.all(),
+        queryset=Choice.objects.none(),
         label="選択肢",
         widget=forms.Select(attrs={"class": "form-control"}),
     )
     choices = forms.ModelMultipleChoiceField(
-        queryset=Choice.objects.all(),
+        queryset=Choice.objects.none(),
         label="複数選択式",
         widget=forms.CheckboxSelectMultiple(),
     )
     rating_score = forms.ChoiceField(
         label="評価スコア",
-        choices=[(i, str(i)) for i in range(1, 6)]  # 1~5の評価スコアから選択
+        choices=[(i, str(i)) for i in range(1, 6)],  # 1~5の評価スコアから選択
+        widget=forms.Select(attrs={"class": "form-control"}),
     )
     class Meta:
         model = Answer
@@ -103,17 +69,9 @@ class AnswerForm(forms.ModelForm):
         super(AnswerForm, self).__init__(*args, **kwargs)
 
         if question is not None:
-            if question.question_type == 'TX':  #テキストフィールドの場合
-                self.fields['text'].required = True # テキストフィールドを必須にする
-            elif question.question_type == 'SC':    #単一選択式の場合
-                self.fields['choice'].required = True
+            if question.question_type == 'SC':    #単一選択式の場合
                 self.fields['choice'].queryset = Choice.objects.filter(question=question)   # 特定の質問に関連する選択肢のみを表示するためにフィルタする
+                print(self.fields['choice'].queryset)
             elif question.question_type == 'MC':    #複数選択式の場合
-                self.fields['choices'].required = True
                 self.fields['choices'].queryset = Choice.objects.filter(question=question)
-            elif question.question_type == 'RS':    #評価スケールの場合
-                self.fields['rating_score'].required = True
-            else:
-                # 認識されない質問タイプの場合は、すべてのフィールドを非表示にする
-                for field_name in ['text', 'choice', 'choices', 'rating_score']:
-                    self.fields[field_name].widget = forms.HiddenInput()
+                print(self.fields['choices'].queryset)
