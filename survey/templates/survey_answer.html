@@ -18,7 +18,7 @@
                 {% elif question.question_type == 'SC' %}
                     {{ answer_form.choice }}
                 {% elif question.question_type == 'MC' %}
-                    {{ answer_form.choices }}
+                    {{ answer_form.multiple_choices }}
                 {% elif question.question_type == 'RS' %}
                     {{ answer_form.rating_score }}
                 {% endif %}

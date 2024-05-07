@@ -98,7 +98,6 @@ def survey_answer(request, pk):
         answer_forms = []
         for question in questions:
             choices = Choice.objects.filter(question=question)
-            print(choices)
             answer_form = AnswerForm(question=question)
             answer_forms.append((question, answer_form, choices))   # question,formのペアのタプルを生成
         context = {

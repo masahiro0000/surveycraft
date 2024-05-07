@@ -60,19 +60,6 @@ class Choice(models.Model):
     def __str__(self):
         return self.text
 
-class Rating(models.Model):
-    question = models.ForeignKey(
-        Question,
-        related_name="rating_score",
-        on_delete=models.CASCADE
-        )
-    rating_score = models.PositiveIntegerField(
-        choices=[(i, str(i)) for i in range(1,6)]   # 1~5の評価スコア
-        )
-
-    def __str__(self):
-        return f"{self.question} - {self.rating_score}"
-
 class Answer(models.Model):
     question = models.ForeignKey(
         Question,
@@ -89,14 +76,13 @@ class Answer(models.Model):
         null=True,
         related_name="single_choice"
         )
-    choices = models.ManyToManyField(
+    multiple_choices = models.ManyToManyField(
         Choice,
         blank=True,
         related_name="multiple_choices"
         )
-    rating_score = models.ForeignKey(
-        Rating,
-        on_delete=models.CASCADE,
+    rating_score = models.PositiveIntegerField(
+        choices=[(i, str(i)) for i in range(1,6)],
         blank=True,
         null=True,
         )
@@ -104,8 +90,8 @@ class Answer(models.Model):
     def __str__(self):
         if self.question.question_type == Question.SINGLE_CHOICE and self.choice:
             return f"Single Choice Answer: {self.choice.text}"
-        elif self.question.question_type == Question.MULTIPLE_CHOICE and self.choices.exists():
-            choices_texts = ', '.join(choice.text for choice in self.choices.all())
+        elif self.question.question_type == Question.MULTIPLE_CHOICE and self.multiple_choices.exists():
+            choices_texts = ', '.join(choice.text for choice in self.multiple_choices.all())
             return f"Multiple Choice Answers: {choices_texts}"
         elif self.question.question_type == Question.RATING_SCORE and self.rating_score:
             return f"Rating Scale: {self.rating_score}"
