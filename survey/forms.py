@@ -44,32 +44,48 @@ class ChoiceForm(forms.ModelForm):
 class AnswerForm(forms.ModelForm):
     text = forms.CharField(
         label="回答",
-        widget=forms.TextInput(attrs={"class": "form-control"}))
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        required=False,
+    )
     choice = forms.ModelChoiceField(
         queryset=Choice.objects.none(),
         label="選択肢",
         widget=forms.Select(attrs={"class": "form-control"}),
+        required=False,
     )
     multiple_choices = forms.ModelMultipleChoiceField(
         queryset=Choice.objects.none(),
         label="複数選択式",
         widget=forms.CheckboxSelectMultiple(),
+        required=False,
     )
     rating_score = forms.ChoiceField(
         choices=[(i, str(i)) for i in range(1, 6)], # 1から5までの評価スコアを選択肢として設定
         label="評価スコア",
         widget=forms.Select(attrs={"class": "form-control"}),
+        required=False,
     )
     class Meta:
         model = Answer
-        fields = ['text', 'choice', 'multiple_choices', 'rating_score']
+        #fields = ['text', 'choice', 'multiple_choices', 'rating_score']
+        fields = [] # 空に設定し、__init__でフィールドを動的に追加
 
     def __init__(self, *args, **kwargs):
         question = kwargs.pop('question', None) # 質問インスタンスをキーワード引数から取り出す
-        super(AnswerForm, self).__init__(*args, **kwargs)
+        #super(AnswerForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if question is not None:
-            if question.question_type == 'SC':    #単一選択式の場合
+            if question.question_type == 'TX':  # テキスト回答
+                self.fields['text'].required = True
+            elif question.question_type == 'SC':    #単一選択式の場合
                 self.fields['choice'].queryset = Choice.objects.filter(question=question)   # 特定の質問に関連する選択肢のみを表示するためにフィルタする
             elif question.question_type == 'MC':    #複数選択式の場合
                 self.fields['multiple_choices'].queryset = Choice.objects.filter(question=question)
+            elif question.question_type == 'RS':    # 評価スコア
+                self.fields['rating_score'].required = True
+
+            # 他のフィールドを無効化
+            #for field_name in ['text', 'choice', 'multiple_choices', 'rating_score']:
+            #    if field_name not in self.fields:
+            #        self.fields[field_name].widget = forms.HiddenInput()

@@ -9,9 +9,16 @@
         <h3>{{ survey.title }}</h3>
         <h4>{{ survey.description }}</h4>
         <hr>
+
+        {% if errors %}
+            <div class="alert alert-danger">
+                {{ errors }}
+            </div>
+        {% endif %}
+
         <form method="POST">
             {% csrf_token %}
-            {% for question, answer_form, choice in answer_forms %}
+            {% for question, answer_form in answer_forms %}
                 {{ question.text }}
                 {% if question.question_type == 'TX' %}
                     {{ answer_form.text }}

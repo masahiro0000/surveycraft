@@ -84,24 +84,40 @@ def my_survey(request):
 def survey_answer(request, pk):
     survey = get_object_or_404(Survey, pk=pk)
     questions = Question.objects.filter(survey=survey)
+
+    # 初期化
+    context = {
+        "survey": survey,
+        "errors": None,
+    }
+    answer_forms = []
+
     if request.method == "POST":
+        is_all_valid = True    # 全てのフォームが有効かどうかをチェックするフラグ
+        answer_forms = []   # POSTデータから生成されたフォームを保存するリスト
+
         # POSTリクエストの場合は、各質問に対して回答を保存
         for question in questions:
-            answer_form = AnswerForm(request.POST, question=question)
-            if answer_form.is_valid():
-                answer_form.save(commit=False)
-                answer_form.question = question
-                answer_form.save()
-        return redirect('index')
+            form = AnswerForm(request.POST, question=question)
+            if form.is_valid():
+                answer = form.save(commit=False)
+                answer.question = question
+                answer.save()
+            else:
+                print(form.errors)
+                is_all_valid = False
+            answer_forms.append((question, form))   # バリデーションエラーのあるフォームを追加
+
+        if is_all_valid:
+            return redirect('index')
+        else:
+            # 一つでも無効なフォームがあった場合、エラーメッセージとともにフォームを再表示
+            context["errors"] = "入力内容に誤りがあります"
     else:
         # GETリクエストの場合は、各質問に対する空のフォームを生成
         answer_forms = []
         for question in questions:
-            choices = Choice.objects.filter(question=question)
             answer_form = AnswerForm(question=question)
-            answer_forms.append((question, answer_form, choices))   # question,formのペアのタプルを生成
-        context = {
-            "survey": survey,
-            "answer_forms": answer_forms,
-        }
-        return render(request, "survey_answer.html", context)
+            answer_forms.append((question, answer_form))   # question,formのペアのタプルを生成
+    context["answer_forms"] = answer_forms
+    return render(request, "survey_answer.html", context)
