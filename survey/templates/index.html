@@ -1,9 +1,33 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    index
+    サービス紹介ページ
 {% endblock %}
 
 {% block content %}
-    index
+    <div class="container">
+        <h3>surveycraftとは</h3>
+        アンケートフォームをスムーズに作成するためのツールです。
+    </div>
+        <div class="container marketing">
+            <div class="row featurette">
+                <div class="col-md-7 order-md-2">
+                    <h2 class="featurette-heading fw-normal lh-1">
+                        <span class="text-body-secondary">こんな時、アンケートが簡単に作成できたらいいなと思いませんか？</span>
+                        <ul class="lead">
+                            <li>マーケティングのための調査</li>
+                            <li>顧客満足度調査</li>
+                            <li>職場の調査</li>
+                        </ul>
+                    </h2>
+                </div>
+                <div class="col-md-5 order-md-1">
+                    <img src="https://www.sungrove.co.jp/wp-content/uploads/2021/02/web-questionnaire-tools_c.jpg" alt="アンケート調査イラスト" width="300" height="300">
+                </div>
+            </div>
+        </div>
+        <hr class="featurette-divider">
+        <a href="{% url 'login' %}" class="btn btn-primary">ログイン</a>
+        or
+        <a href="{% url 'signup' %}" class="btn btn-primary">Sign Up</a>
 {% endblock %}

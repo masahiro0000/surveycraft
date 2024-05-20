@@ -6,13 +6,29 @@
 
 {% block content %}
     <div class="container">
-        {% for survey in surveys %}
-            <p>タイトル</p>
-            {{ survey.title }}
-            <p>詳細</p>
-            {{ survey.description }}
-            <a href="{{ survey.get_absolute_url }}" class="btn btn-primary">このアンケートに回答する</a>
-            <br>
-        {% endfor %}
+        <article class="my-3" id="table">
+            <div class="db-example-snippet db-code-snippet">
+                <div class="db-example m-0 border-0">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">タイトル</th>
+                                <th scope="col">詳細</th>
+                                <th scope="col">このアンケートに回答する</th>
+                            </tr>
+                        </thead>
+                        {% for survey in surveys %}
+                            <tbody>
+                                <tr>
+                                    <td>{{ survey.title }}</td>
+                                    <td>{{ survey.description }}</td>
+                                    <td><a href="{{ survey.get_absolute_url }}">回答ページへ</a></td>
+                                </tr>
+                            </tbody>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </article>
     </div>
 {% endblock %}

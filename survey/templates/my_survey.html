@@ -7,14 +7,32 @@
 {% block content %}
     <div class="container">
         {% if surveys %}
-            {% for survey in surveys %}
-                <p class="h5">タイトル</p>
-                {{ survey.title }}
-                <br><br>
-                <p class="h6">説明</p>
-                {{ survey.description }}
-                <br><br>
-            {% endfor %}
+            <article class="my-3" id="table">
+                <div class="db-example-snippet db-code-snippet">
+                    <div class="db-example m-0 border-0">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">タイトル</th>
+                                    <th scope="col">詳細</th>
+                                    <th scope="col">結果リンク</th>
+                                    <th scope="col">削除リンク</th>
+                                </tr>
+                            </thead>
+                            {% for survey in surveys %}
+                                <tbody>
+                                    <tr>
+                                        <td>{{ survey.title }}</td>
+                                        <td>{{ survey.description }}</td>
+                                        <td><a href="{% url 'survey-result' pk=survey.pk %}">集計結果を見る</a></td>
+                                        <td><a href="{% url 'delete' pk=survey.pk %}">削除する</a></td>
+                                    </tr>
+                                </tbody>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </article>
         {% else %}
             <h3>作成済みのアンケートはありません</h3>
         {% endif %}

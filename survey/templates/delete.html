@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h3>このアンケートを本当に削除しますか？</h3>
+        {{ survey.title }}
+        <br>
+        {{ survey.description }}
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">削除</button>
+        </form>
+        <a href="{% url 'survey-all' %}">キャンセル</a>
+    </div>
+{% endblock %}

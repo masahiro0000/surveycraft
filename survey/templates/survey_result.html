@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        {{ survey.title }}
+        {{ survey.description }}
+        <br>
+        <img src="{% url 'survey-chart' pk=survey.id %}" alt="集計結果のグラフを表示">
+    </div>
+{% endblock %}

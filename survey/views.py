@@ -1,9 +1,12 @@
+import uuid
+import matplotlib.pyplot as plt
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.db.models import Count
 from .forms import *
 from accounts.models import Profile
-from django.forms import modelformset_factory
-import uuid
+from io import BytesIO
 
 def index(request):
     return render(request, "index.html")
@@ -102,7 +105,12 @@ def survey_answer(request, pk):
             if form.is_valid():
                 answer = form.save(commit=False)
                 answer.question = question
-                answer.save()
+
+                # Multiple choiceの場合、違う保存方法
+                if question.question_type == 'MC':
+                    answer.save_m2m()
+                else:
+                    answer.save()
             else:
                 print(form.errors)
                 is_all_valid = False
@@ -121,3 +129,62 @@ def survey_answer(request, pk):
             answer_forms.append((question, answer_form))   # question,formのペアのタプルを生成
     context["answer_forms"] = answer_forms
     return render(request, "survey_answer.html", context)
+
+def delete(request, pk):
+    survey = get_object_or_404(Survey, id=pk)
+    if request.method == 'POST':
+        survey.delete()
+        return redirect('survey-all')
+    else:
+        context = {
+            "survey": survey,
+        }
+        return render(request, "delete.html", context)
+
+def survey_result(request, pk):
+    survey = get_object_or_404(Survey, id=pk)
+    context = {
+        "survey": survey,
+    }
+    return render(request, "survey_result.html", context)
+
+def survey_chart(request, pk):
+    survey = get_object_or_404(Survey, id=pk)
+    questions = survey.questions.all()
+    fig, axs = plt.subplots(len(questions), figsize=(10, 5 * len(questions)))
+
+    for i, question in enumerate(questions):
+        answers = Answer.objects.filter(question=question)
+
+        if question.question_type == 'SC':
+            data = answers.values('single_choice').annotate(total=Count('single_choice'))
+            labels = [d['single_choice'] for d in data]
+            counts = [d['total'] for d in data]
+            axs[i].bar(labels, counts, color="blue")
+        elif question.question_type == 'MC':
+            choices = Choice.objects.filter(question=question)
+            choice_counts = {choice.choice_text: 0 for choice in choices}
+            for answer in answers:
+                for choice in choices:
+                    choice_counts[choice.choice_text] += 1
+            labels = list(choice_counts.keys())
+            counts = list(choice_counts.values())
+            axs[i].bar(labels, counts, colors="orange")
+        elif question.question_type == 'RS':
+            data = answers.values('rating_score').annotate(total=Count('rating_score'))
+            labels = [str(d['rating_score'] for d in data)]
+            counts = [d['total'] for d in data]
+            axs[i].bar(labels, counts, color='green')
+        elif question.question_type == 'TX':
+            data = answers.count()
+            labels =['Response']
+            counts = [data]
+            axs[i].bar(labels, counts, color="purple")
+
+        axs[i].set_title(question.text)
+        axs[i].set_ylabel('Count')
+
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    return HttpResponse(buf, content_type='image/png')

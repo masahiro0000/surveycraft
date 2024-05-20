@@ -72,20 +72,16 @@ class AnswerForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         question = kwargs.pop('question', None) # 質問インスタンスをキーワード引数から取り出す
-        #super(AnswerForm, self).__init__(*args, **kwargs)
         super().__init__(*args, **kwargs)
 
         if question is not None:
             if question.question_type == 'TX':  # テキスト回答
-                self.fields['text'].required = True
+                self.fields['text'].required = True # 必須回答にする
             elif question.question_type == 'SC':    #単一選択式の場合
                 self.fields['choice'].queryset = Choice.objects.filter(question=question)   # 特定の質問に関連する選択肢のみを表示するためにフィルタする
+                self.fields['choice'].required = True
             elif question.question_type == 'MC':    #複数選択式の場合
                 self.fields['multiple_choices'].queryset = Choice.objects.filter(question=question)
+                self.fields['multiple_choices'].required = True
             elif question.question_type == 'RS':    # 評価スコア
                 self.fields['rating_score'].required = True
-
-            # 他のフィールドを無効化
-            #for field_name in ['text', 'choice', 'multiple_choices', 'rating_score']:
-            #    if field_name not in self.fields:
-            #        self.fields[field_name].widget = forms.HiddenInput()
