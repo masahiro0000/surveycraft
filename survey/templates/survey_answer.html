@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %}
     アンケート回答ページ
@@ -20,15 +21,7 @@
             {% csrf_token %}
             {% for question, answer_form in answer_forms %}
                 {{ question.text }}
-                {% if question.question_type == 'TX' %}
-                    {{ answer_form.text }}
-                {% elif question.question_type == 'SC' %}
-                    {{ answer_form.choice }}
-                {% elif question.question_type == 'MC' %}
-                    {{ answer_form.multiple_choices }}
-                {% elif question.question_type == 'RS' %}
-                    {{ answer_form.rating_score }}
-                {% endif %}
+                {{ answer_form|get_dynamic_field:question.id }}
             {% endfor %}
             <button class="btn btn-primary">送信</button>
         </form>

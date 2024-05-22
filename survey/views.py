@@ -102,13 +102,15 @@ def survey_answer(request, pk):
         # POSTリクエストの場合は、各質問に対して回答を保存
         for question in questions:
             form = AnswerForm(request.POST, question=question)
+            # print(form)
             if form.is_valid():
                 answer = form.save(commit=False)
                 answer.question = question
 
                 # Multiple choiceの場合、違う保存方法
                 if question.question_type == 'MC':
-                    answer.save_m2m()
+                    # answer.save_m2m()
+                    answer.save()
                 else:
                     answer.save()
             else:
