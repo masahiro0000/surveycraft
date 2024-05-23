@@ -1,4 +1,3 @@
-import uuid
 import matplotlib.pyplot as plt
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -102,7 +101,6 @@ def survey_answer(request, pk):
         # POSTリクエストの場合は、各質問に対して回答を保存
         for question in questions:
             form = AnswerForm(request.POST, question=question)
-            # print(form)
             if form.is_valid():
                 answer = Answer.objects.create(question=question)
                 if question.question_type == 'TX':
@@ -113,10 +111,9 @@ def survey_answer(request, pk):
                     answer.multiple_choices.set(form.cleaned_data[f"q_{question.id}"])
                 elif question.question_type == 'RS':
                     answer.rating_score = form.cleaned_data[f"q_{question.id}"]
-                    
+
                 answer.save()
             else:
-                print(form.errors)
                 is_all_valid = False
             answer_forms.append((question, form))   # バリデーションエラーのあるフォームを追加
 
@@ -138,7 +135,7 @@ def delete(request, pk):
     survey = get_object_or_404(Survey, id=pk)
     if request.method == 'POST':
         survey.delete()
-        return redirect('survey-all')
+        return redirect('my-survey')
     else:
         context = {
             "survey": survey,
