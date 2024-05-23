@@ -42,32 +42,8 @@ class ChoiceForm(forms.ModelForm):
         fields = ['text']
 
 class AnswerForm(forms.ModelForm):
-    # text = forms.CharField(
-    #     label="回答",
-    #     widget=forms.TextInput(attrs={"class": "form-control"}),
-    #     required=False,
-    # )
-    # choice = forms.ModelChoiceField(
-    #     queryset=Choice.objects.none(),
-    #     label="選択肢",
-    #     widget=forms.Select(attrs={"class": "form-control", "name": "asdfasdfa"}),
-    #     required=False,
-    # )
-    # multiple_choices = forms.ModelMultipleChoiceField(
-    #     queryset=Choice.objects.none(),
-    #     label="複数選択式",
-    #     widget=forms.CheckboxSelectMultiple(),
-    #     required=False,
-    # )
-    # rating_score = forms.ChoiceField(
-    #     choices=[(i, str(i)) for i in range(1, 6)], # 1から5までの評価スコアを選択肢として設定
-    #     label="評価スコア",
-    #     widget=forms.Select(attrs={"class": "form-control"}),
-    #     required=False,
-    # )
     class Meta:
         model = Answer
-        #fields = ['text', 'choice', 'multiple_choices', 'rating_score']
         fields = [] # 空に設定し、__init__でフィールドを動的に追加
 
     def __init__(self, *args, **kwargs):
@@ -102,5 +78,3 @@ class AnswerForm(forms.ModelForm):
                     widget=forms.Select(attrs={"class": "form-control"}),
                     required=True,
                 )
-
-        print(self.fields)

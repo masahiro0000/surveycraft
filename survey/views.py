@@ -1,3 +1,7 @@
+# Matplotlibの設定を変更してGUIバックエンドを使わないようにする
+import matplotlib
+matplotlib.use('AGG')
+
 import matplotlib.pyplot as plt
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -158,22 +162,23 @@ def survey_chart(request, pk):
         answers = Answer.objects.filter(question=question)
 
         if question.question_type == 'SC':
-            data = answers.values('single_choice').annotate(total=Count('single_choice'))
-            labels = [d['single_choice'] for d in data]
+            data = answers.values('choice').annotate(total=Count('choice'))
+            labels = [d['choice'] for d in data]
             counts = [d['total'] for d in data]
             axs[i].bar(labels, counts, color="blue")
         elif question.question_type == 'MC':
             choices = Choice.objects.filter(question=question)
             choice_counts = {choice.text: 0 for choice in choices}
             for answer in answers:
-                for choice in choices:
+                selected_choices = answer.multiple_choices.all()
+                for choice in selected_choices:
                     choice_counts[choice.text] += 1
             labels = list(choice_counts.keys())
             counts = list(choice_counts.values())
-            axs[i].bar(labels, counts, colors="orange")
+            axs[i].bar(labels, counts, color="orange")
         elif question.question_type == 'RS':
             data = answers.values('rating_score').annotate(total=Count('rating_score'))
-            labels = [str(d['rating_score'] for d in data)]
+            labels = [str(d['rating_score']) for d in data]
             counts = [d['total'] for d in data]
             axs[i].bar(labels, counts, color='green')
         elif question.question_type == 'TX':
@@ -185,6 +190,7 @@ def survey_chart(request, pk):
         axs[i].set_title(question.text)
         axs[i].set_ylabel('Count')
 
+    plt.tight_layout()
     buf = BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
