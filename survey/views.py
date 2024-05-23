@@ -102,15 +102,19 @@ def survey_answer(request, pk):
         # POSTリクエストの場合は、各質問に対して回答を保存
         for question in questions:
             form = AnswerForm(request.POST, question=question)
+            # print(form)
             if form.is_valid():
-                answer = form.save(commit=False)
-                answer.question = question
-
-                # Multiple choiceの場合、違う保存方法
-                if question.question_type == 'MC':
-                    answer.save_m2m()
-                else:
-                    answer.save()
+                answer = Answer.objects.create(question=question)
+                if question.question_type == 'TX':
+                    answer.text = form.cleaned_data[f"q_{question.id}"]
+                elif question.question_type == 'SC':
+                    answer.choice = form.cleaned_data[f"q_{question.id}"]
+                elif question.question_type == 'MC':
+                    answer.multiple_choices.set(form.cleaned_data[f"q_{question.id}"])
+                elif question.question_type == 'RS':
+                    answer.rating_score = form.cleaned_data[f"q_{question.id}"]
+                    
+                answer.save()
             else:
                 print(form.errors)
                 is_all_valid = False
@@ -163,10 +167,10 @@ def survey_chart(request, pk):
             axs[i].bar(labels, counts, color="blue")
         elif question.question_type == 'MC':
             choices = Choice.objects.filter(question=question)
-            choice_counts = {choice.choice_text: 0 for choice in choices}
+            choice_counts = {choice.text: 0 for choice in choices}
             for answer in answers:
                 for choice in choices:
-                    choice_counts[choice.choice_text] += 1
+                    choice_counts[choice.text] += 1
             labels = list(choice_counts.keys())
             counts = list(choice_counts.values())
             axs[i].bar(labels, counts, colors="orange")

@@ -6,3 +6,4 @@ mysqlclient==2.2.4
 packaging==24.0
 PyMySQL==1.1.0
 sqlparse==0.4.4
+matplotlib==3.9.0
