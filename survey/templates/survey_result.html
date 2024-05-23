@@ -2,9 +2,19 @@
 
 {% block content %}
     <div class="container">
-        {{ survey.title }}
-        {{ survey.description }}
-        <br>
-        <img src="{% url 'survey-chart' pk=survey.id %}" alt="集計結果のグラフを表示">
+        <div class="bd-cheatsheet container-fluid bg-body">
+            <section id="content">
+                <article class="my-3" id="typography">
+                    <div class="bd-example-snippet bd-code-snippet">
+                        <div class="bd-example m-0 border-0">
+                            <p class="h3">タイトル：{{ survey.title }}</p>
+                            <p class="h4">説明：{{ survey.description }}</p>
+                            <br>
+                            <img src="{% url 'survey-chart' pk=survey.id %}" alt="集計結果のグラフを表示">
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </div>
     </div>
 {% endblock %}
