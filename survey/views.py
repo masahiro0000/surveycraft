@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.db.models import Count
+from django.db.models import Count, F
 from .forms import *
 from accounts.models import Profile
 from io import BytesIO
@@ -162,8 +162,8 @@ def survey_chart(request, pk):
         answers = Answer.objects.filter(question=question)
 
         if question.question_type == 'SC':
-            data = answers.values('choice').annotate(total=Count('choice'))
-            labels = [d['choice'] for d in data]
+            data = answers.values(choice_text=F('choice__text')).annotate(total=Count('choice'))
+            labels = [d['choice_text'] for d in data]
             counts = [d['total'] for d in data]
             axs[i].bar(labels, counts, color="blue")
         elif question.question_type == 'MC':
@@ -189,6 +189,10 @@ def survey_chart(request, pk):
 
         axs[i].set_title(question.text)
         axs[i].set_ylabel('Count')
+
+        # Y軸の目盛りを調整（最大値に余裕を持たせる）
+        axs[i].set_ylim(0, max(counts) + 1)
+        axs[i].set_yticks(range(0, max(counts) + 2, 1)) # 1刻みで目盛りを表示
 
     plt.tight_layout()
     buf = BytesIO()
