@@ -2,14 +2,26 @@
 
 {% block content %}
     <div class="container">
-        <h3>このアンケートを本当に削除しますか？</h3>
-        {{ survey.title }}
-        <br>
-        {{ survey.description }}
-        <form method="POST">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">削除</button>
-        </form>
-        <a href="{% url 'survey-all' %}">キャンセル</a>
+        <div class="bd-cheatsheet container-fluid bg-body">
+            <section id="content">
+                <article class="my-3" id="typography">
+                    <div class="bd-example-snippet bd-code-snippet">
+                        <div class="bd-example m-0 border-0">
+                            <h3>このアンケートを本当に削除しますか？</h3>
+                            <br>
+                            <p class="h5">タイトル：{{ survey.title }}</p>
+                            <p class="h5">説明：{{ survey.description }}</p>
+                            <br>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">削除</button>
+                                &nbsp;
+                                <a href="{% url 'my-survey' %}">キャンセル</a>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </div>
     </div>
 {% endblock %}
