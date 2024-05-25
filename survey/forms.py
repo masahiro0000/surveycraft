@@ -55,26 +55,26 @@ class AnswerForm(forms.ModelForm):
                 self.fields[f"q_{question.id}"] = forms.CharField(
                     label="回答",
                     widget=forms.TextInput(attrs={"class": "form-control"}),
-                    required=True,
+                    required=question.is_required,
                 )
             elif question.question_type == 'SC':    #単一選択式の場合
                 self.fields[f"q_{question.id}"] = forms.ModelChoiceField(
                     queryset=Choice.objects.filter(question=question),
                     label="選択肢",
                     widget=forms.Select(attrs={"class": "form-control"}),
-                    required=True,
+                    required=question.is_required,
                 )
             elif question.question_type == 'MC':    #複数選択式の場合
                 self.fields[f"q_{question.id}"] = forms.ModelMultipleChoiceField(
                     queryset=Choice.objects.filter(question=question),
                     label="複数選択式",
                     widget=forms.CheckboxSelectMultiple(),
-                    required=True,
+                    required=question.is_required,
                 )
             elif question.question_type == 'RS':    # 評価スコア
                 self.fields[f"q_{question.id}"] = forms.ChoiceField(
                     choices=[(i, str(i)) for i in range(1, 6)], # 1から5までの評価スコアを選択肢として設定
                     label="評価スコア",
                     widget=forms.Select(attrs={"class": "form-control"}),
-                    required=True,
+                    required=question.is_required,
                 )
