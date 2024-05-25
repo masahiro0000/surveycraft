@@ -6,6 +6,11 @@
 
 {% block content %}
     <div class="container">
+        {% if message %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endif %}
         <h2>surveycraftとは</h2>
         <p>アンケートフォームをスムーズに作成するためのツールです。</p>
         <div class="container marketing">

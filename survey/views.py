@@ -122,7 +122,8 @@ def survey_answer(request, pk):
             answer_forms.append((question, form))   # バリデーションエラーのあるフォームを追加
 
         if is_all_valid:
-            return redirect('index')
+            context["message"] = "回答を送信しました"
+            return render(request, "index.html", context)
         else:
             # 一つでも無効なフォームがあった場合、エラーメッセージとともにフォームを再表示
             context["errors"] = "入力内容に誤りがあります"
